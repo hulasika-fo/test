@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/15125505/zlog/log"
+	"github.com/google/uuid"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -140,5 +141,14 @@ func DoCommand(cmd string, stdout, stderr *bytes.Buffer) (err error) {
 		p.Stderr = stderr
 	}
 	err = p.Run()
+	return
+}
+
+func UUID() (id string, err error) {
+	u1, err := uuid.NewUUID()
+	if err != nil {
+		log.Error(err)
+	}
+	id = u1.String()
 	return
 }
