@@ -1,8 +1,11 @@
 package main
 
-import "github.com/hulasika-fo/tools/tools"
+import (
+	"github.com/hulasika-fo/tools/tools"
+	"github.com/hulasika-fo/zlog/log"
+)
 
-func main () {
-    tools.Print()
-    return
+func main() {
+	log.Info(tools.UUID())
+	return
 }

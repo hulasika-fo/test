@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/15125505/zlog/log"
+	"github.com/hulasika-fo/zlog/log"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -60,7 +60,9 @@ func HttpGetWithHeader(url string, mHead map[string]string) (rData []byte, err e
 	if err != nil {
 		return
 	}
-	defer res.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(res.Body)
 	rData, err = ioutil.ReadAll(res.Body)
 	if err != nil {
 		log.Error(logHeader, "读取反馈失败：", err)
@@ -70,7 +72,7 @@ func HttpGetWithHeader(url string, mHead map[string]string) (rData []byte, err e
 	return
 }
 
-// 上传文件
+// HttpPostFileWithHeader 上传文件
 func HttpPostFileWithHeader(path string, mHead map[string]string, file multipart.File, fileName string) (rData []byte, oErr error) {
 	oErr = errors.New(`上传文件失败`)
 	tmId := time.Now().UnixNano()
@@ -86,11 +88,11 @@ func HttpPostFileWithHeader(path string, mHead map[string]string, file multipart
 
 	body := make([]byte, 0)
 	buf := bytes.NewBuffer(body)
-	io.WriteString(buf, fmt.Sprintf("--%v\r\n", boundary))
-	io.WriteString(buf, fmt.Sprintf(`Content-Disposition: form-data; name="%v"; filename="%v"`, "file", fileName)+"\r\n")
-	io.WriteString(buf, "Content-Type: video/mp4\r\n\r\n")
-	io.WriteString(buf, string(f))
-	io.WriteString(buf, fmt.Sprintf("\r\n--%v--\r\n", boundary))
+	_, _ = io.WriteString(buf, fmt.Sprintf("--%v\r\n", boundary))
+	_, _ = io.WriteString(buf, fmt.Sprintf(`Content-Disposition: form-data; name="%v"; filename="%v"`, "file", fileName)+"\r\n")
+	_, _ = io.WriteString(buf, "Content-Type: video/mp4\r\n\r\n")
+	_, _ = io.WriteString(buf, string(f))
+	_, _ = io.WriteString(buf, fmt.Sprintf("\r\n--%v--\r\n", boundary))
 
 	req, err := http.NewRequest("POST", path, buf)
 	if err != nil {
@@ -109,7 +111,7 @@ func HttpPostFileWithHeader(path string, mHead map[string]string, file multipart
 		return
 	}
 	defer func() {
-		res.Body.Close()
+		_ = res.Body.Close()
 	}()
 	rData, err = ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -132,7 +134,9 @@ func httpGet(url string) (ret []byte, err error) {
 	if err != nil {
 		return
 	}
-	defer res.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(res.Body)
 	ret, err = ioutil.ReadAll(res.Body)
 	if err != nil {
 		log.Error(logHeader, "读取反馈失败：", err)
@@ -158,7 +162,9 @@ func httpPost(url, body string, mHead map[string]string) (ret []byte, err error)
 		log.Error(logHeader, "发起请求失败：", err)
 		return
 	}
-	defer res.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(res.Body)
 	ret, err = ioutil.ReadAll(res.Body)
 	if err != nil {
 		log.Error(logHeader, "读取反馈失败：", err)
