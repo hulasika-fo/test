@@ -125,7 +125,7 @@ func GetSep() string {
 	}
 }
 
-func DoCommand(cmd string, stdout, stderr *bytes.Buffer) (err error) {
+func DoCommand(cmd string, stdout, stderr *bytes.Buffer, dir string) (err error) {
 	c := "cmd"
 	a := "/c"
 	if strings.ToLower(runtime.GOOS) == "linux" {
@@ -134,6 +134,7 @@ func DoCommand(cmd string, stdout, stderr *bytes.Buffer) (err error) {
 	}
 	log.Info(`exec command`, c, a, cmd)
 	p := exec.Command(c, a, cmd)
+	p.Dir = dir
 	if stdout != nil {
 		p.Stdout = stdout
 	}
